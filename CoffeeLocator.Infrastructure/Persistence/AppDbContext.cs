@@ -23,6 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<Visit> Visits { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Achievement> Achievements { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 
     /// <summary>
     /// Configures the schema and relationships using Fluent API.
