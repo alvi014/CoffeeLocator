@@ -1,5 +1,6 @@
 ﻿using CoffeeLocator.Application.DTOs.CoffeeShops;
 using CoffeeLocator.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoffeeLocator.Api.Controllers;
@@ -25,7 +26,6 @@ public class CoffeeShopsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CoffeeShopResponseDto>>> GetCoffeeShops()
     {
-        // Usamos el servicio para obtener la lista procesada
         var shops = await _coffeeShopService.GetNearbyShopsAsync(0, 0);
         return Ok(shops);
     }
@@ -71,4 +71,21 @@ public class CoffeeShopsController : ControllerBase
 
         return CreatedAtAction(nameof(GetCoffeeShop), new { id = result.Id }, result);
     }
+
+    /// <summary>
+    /// Deletes a coffee shop by its unique identifier. Only accessible to users with the "Admin" role.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")] 
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var result = await _coffeeShopService.DeleteAsync(id);
+
+        if (!result) return NotFound("No se encontró la cafetería.");
+
+        return NoContent(); 
+    }
+
 }

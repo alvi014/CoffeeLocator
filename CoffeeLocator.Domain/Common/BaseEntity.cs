@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoffeeLocator.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,14 @@ namespace CoffeeLocator.Domain.Common;
 /// <summary>
 /// Base class for all domain entities.
 /// </summary>
-public abstract class BaseEntity
+public abstract class BaseEntity : IAuditableEntity
 {
-    public Guid Id { get; protected set; } = Guid.NewGuid();
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; protected set; }
+    public Guid Id { get; set; }
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModifiedAt { get; set; }
+    public string? LastModifiedBy { get; set; }
 }

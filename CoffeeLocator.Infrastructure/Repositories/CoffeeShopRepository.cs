@@ -64,4 +64,15 @@ public class CoffeeShopRepository : ICoffeeShopRepository
         await _context.CoffeeShops.AddAsync(shop);
         await _context.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Metod <see langword="for"/> updating an existing CoffeeShop in the database.
+    /// </summary>
+    /// <param name="coffeeShop"></param>
+    /// <returns></returns>
+    public async Task DeleteAsync(CoffeeShop coffeeShop)
+    {
+        _context.CoffeeShops.Remove(coffeeShop);
+        await _context.SaveChangesAsync();
+    }
 }

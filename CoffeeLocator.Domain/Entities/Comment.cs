@@ -38,6 +38,5 @@ public class Comment : BaseEntity
     public void MarkAsRead()
     {
         IsReadByAdmin = true;
-        // UpdatedAt inherited from BaseEntity
     }
 }

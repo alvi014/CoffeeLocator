@@ -8,11 +8,14 @@ namespace CoffeeLocator.Application.Services;
 public class CoffeeShopService : ICoffeeShopService
 {
     private readonly ICoffeeShopRepository _repository;
+    private readonly IGooglePlacesService _googlePlacesService;
 
-    public CoffeeShopService(ICoffeeShopRepository repository)
+    public CoffeeShopService(ICoffeeShopRepository repository, IGooglePlacesService googlePlacesService)
     {
         _repository = repository;
+        _googlePlacesService = googlePlacesService;
     }
+
     /// <summary>
     /// Metod <see langword="for"/> getting all CoffeeShops including their reviews and calculating the distance from the user's location.
     /// </summary>
@@ -89,6 +92,11 @@ public class CoffeeShopService : ICoffeeShopService
         return 6371.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
     }
 
+    /// <summary>
+    /// Metod <see langword="for"/> creating a new CoffeeShop entity and saving it to the repository.
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     public async Task<CoffeeShopResponseDto> CreateCoffeeShopAsync(CreateCoffeeShopDto dto)
     {
         var shop = new CoffeeShop(dto.Name, dto.GooglePlaceId, dto.Address, dto.Latitude, dto.Longitude);
@@ -96,5 +104,19 @@ public class CoffeeShopService : ICoffeeShopService
 
         return new CoffeeShopResponseDto(shop.Id, shop.Name, shop.GooglePlaceId, shop.Address,
                                        shop.Latitude, shop.Longitude, shop.IsPremium, 0, 0, 0);
+    }
+
+    /// <summary>
+    /// Metod <see langword="for"/> deleting a CoffeeShop by its unique identifier.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var shop = await _repository.GetByIdAsync(id);
+        if (shop == null) return false;
+
+        await _repository.DeleteAsync(shop);
+        return true;
     }
 }

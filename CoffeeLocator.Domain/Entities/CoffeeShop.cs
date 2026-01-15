@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using CoffeeLocator.Domain.Common;
+﻿using CoffeeLocator.Domain.Common;
 
 namespace CoffeeLocator.Domain.Entities;
 
@@ -24,15 +18,16 @@ public class CoffeeShop : BaseEntity
     public int TotalReviews => Reviews.Count;
 
     /// <summary>
-    /// Professional constructor for CoffeeShop.
+    /// Builder profesional para CoffeeShop
     /// </summary>
-    /// <param name="name">The commercial name of the coffee shop.</param>
-    /// <param name="googlePlaceId">The unique ID from Google Places API.</param>
-    /// <param name="address">The physical address.</param>
-    /// <param name="latitude">Geographic latitude.</param>
-    /// <param name="longitude">Geographic longitude.</param>
+    /// <param name="name"></param>
+    /// <param name="googlePlaceId"></param>
+    /// <param name="address"></param>
+    /// <param name="latitude"></param>
+    /// <param name="longitude"></param>
     public CoffeeShop(string name, string googlePlaceId, string address, double latitude, double longitude)
     {
+        Id = Guid.NewGuid(); 
         Name = name;
         GooglePlaceId = googlePlaceId;
         Address = address;
@@ -42,9 +37,9 @@ public class CoffeeShop : BaseEntity
     }
 
     /// <summary>
-    /// Updates the premium status of the establishment.
+    /// Metod for updating the premium status of the coffee shop.
     /// </summary>
-    /// <param name="status">The new premium status to set.</param>
+    /// <param name="status"></param>
     public void SetPremiumStatus(bool status)
     {
         IsPremium = status;

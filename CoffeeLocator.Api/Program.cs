@@ -1,9 +1,11 @@
 using CoffeeLocator.Api.Middleware;
+using CoffeeLocator.Application.Interfaces;
+using CoffeeLocator.Application.Services;
 using CoffeeLocator.Application.Validators.CoffeeShops;
 using CoffeeLocator.Infrastructure;
 using CoffeeLocator.Infrastructure.Persistence;
-using CoffeeLocator.Application.Interfaces;
-using CoffeeLocator.Application.Services;
+using CoffeeLocator.Infrastructure.Security; 
+using CoffeeLocator.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,19 +18,27 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Registro de Servicios de Aplicación (Inyección de Dependencias)
 builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();
-// Services
+builder.Services.AddScoped<IAuthService, AuthService>(); 
+
+// FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCoffeeShopValidator>();
 
-// 2. Register core services
+// 2. Registro de Infraestructura y Controladores
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// 3. Servicio para Obtener el Usuario Actual desde el Contexto HTTP
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// --- CONFIGURACIÓN DE SEGURIDAD JWT ---
+
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-// 3. Configuration of Authentication with JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -38,29 +48,29 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
+        ValidateIssuer = true,
+        ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
 
-   
-        NameClaimType = JwtRegisteredClaimNames.Sub
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Name
     };
 });
 
 builder.Services.AddAuthorization();
 
-// 4. Swagger Configuration 
+// 4. Configuración de Swagger con Seguridad JWT
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoffeeLocator API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token.\r\n\r\nExample: \"Bearer 12345abcdef\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -78,7 +88,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Habilitytate XML comments if the XML file is generated
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
@@ -98,19 +107,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// El orden aquí es sagrado:
+app.UseAuthentication(); 
+app.UseAuthorization();  
 
 app.MapControllers();
 
-// 6. Database Initialization 
+// 6. Inicialización de Base de Datos y Migraciones Automáticas
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-
         context.Database.Migrate();
         Console.WriteLine("Database connected and migrations applied successfully.");
     }
