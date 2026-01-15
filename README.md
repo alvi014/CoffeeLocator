@@ -37,15 +37,18 @@ Este sistema permite centralizar la información de cafeterías locales. Los usu
 
 ---
 
-## 🧭 Arquitectura del Sistema
-El proyecto sigue una estructura de **Arquitectura en Capas** para separar responsabilidades:
+## 🏗️ Arquitectura del Proyecto
 
-* **API:** Controladores, Middlewares (Global Exception Handler) y Configuración.
-* **Application:** DTOs, Validadores y Lógica de negocio.
-* **Domain:** Entidades principales y Enums.
-* **Infrastructure:** Persistencia de datos (DbContext), Migraciones y Repositorios.
+El proyecto sigue los principios de **Clean Architecture**, dividiendo las responsabilidades en 4 capas principales:
 
+* **Domain:** Contiene las entidades de negocio (`CoffeeShop`, `Review`), lógica de dominio y contratos de repositorios.
+* **Application:** Maneja los casos de uso, servicios de orquestación, DTOs y lógica de cálculo (Fórmula de Haversine para geolocalización).
+* **Infrastructure:** Implementación de la persistencia de datos con Entity Framework Core y repositorios específicos.
+* **API:** Controladores REST desacoplados que exponen los endpoints documentados con Swagger.
 
+### 🚀 Funcionalidades Clave
+- **Búsqueda por Proximidad:** Cálculo de distancia en tiempo real basado en coordenadas geográficas.
+- **Rating Dinámico:** Cálculo automatizado de promedios de reseñas desde la entidad de dominio.
 
 ---
 
