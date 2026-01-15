@@ -7,21 +7,21 @@ namespace CoffeeLocator.Domain.Entities;
 /// </summary>
 public class Review : BaseEntity
 {
-    public string UserName { get; private set; }
+    public Guid UserId { get; private set; }
     public string Comment { get; private set; }
-    public int Rating { get; private set; } 
+    public int Rating { get; private set; }
     public Guid CoffeeShopId { get; private set; }
 
     /// <summary>
     /// Builds a new Review instance.
     /// </summary>
-    /// <param name="userName"></param>
+    /// <param name="userId"></param>
     /// <param name="comment"></param>
     /// <param name="rating"></param>
     /// <param name="coffeeShopId"></param>
-    public Review(string userName, string comment, int rating, Guid coffeeShopId)
+    public Review(Guid userId, string comment, int rating, Guid coffeeShopId)
     {
-        UserName = userName;
+        UserId = userId;
         Comment = comment;
         Rating = rating;
         CoffeeShopId = coffeeShopId;

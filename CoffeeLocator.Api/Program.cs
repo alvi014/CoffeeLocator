@@ -1,19 +1,23 @@
+using CoffeeLocator.Api.Middleware;
 using CoffeeLocator.Application.Validators.CoffeeShops;
 using CoffeeLocator.Infrastructure;
 using CoffeeLocator.Infrastructure.Persistence;
+using CoffeeLocator.Application.Interfaces;
+using CoffeeLocator.Application.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-using CoffeeLocator.Api.Middleware; 
-
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuration of Fluent Validation
+builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();
+// Services
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCoffeeShopValidator>();
 
@@ -22,7 +26,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// 3. NUEVO: Configuración de Autenticación (Lo que te faltaba)
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+// 3. Configuration of Authentication with JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -32,26 +38,29 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+
+   
+        NameClaimType = JwtRegisteredClaimNames.Sub
     };
 });
 
 builder.Services.AddAuthorization();
 
-// 4. Swagger Configuration (Con soporte para JWT)
+// 4. Swagger Configuration 
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoffeeLocator API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -69,6 +78,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
+    // Habilitytate XML comments if the XML file is generated
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
@@ -78,7 +88,6 @@ var app = builder.Build();
 
 // --- MIDDLEWARE PIPELINE ---
 
-// 5. NUEVO: Exception Middleware (Global Error Handling)
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -87,15 +96,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// 6. Database Initialization
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+// 6. Database Initialization 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        context.Database.EnsureCreated();
-        Console.WriteLine("Database verified/created successfully.");
+
+        context.Database.Migrate();
+        Console.WriteLine("Database connected and migrations applied successfully.");
     }
     catch (Exception ex)
     {
@@ -103,10 +120,4 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthentication(); 
-app.UseAuthorization();  
-
-app.MapControllers();
 app.Run();

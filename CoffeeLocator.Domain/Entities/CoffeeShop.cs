@@ -19,6 +19,9 @@ public class CoffeeShop : BaseEntity
     public double Latitude { get; private set; }
     public double Longitude { get; private set; }
     public bool IsPremium { get; private set; }
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public double AverageRating => Reviews.Any() ? Math.Round(Reviews.Average(r => r.Rating), 1) : 0;
+    public int TotalReviews => Reviews.Count;
 
     /// <summary>
     /// Professional constructor for CoffeeShop.

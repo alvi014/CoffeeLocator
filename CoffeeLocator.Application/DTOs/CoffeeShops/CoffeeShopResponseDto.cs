@@ -7,6 +7,8 @@ public record CoffeeShopResponseDto(
     string Address,
     double Latitude,
     double Longitude,
-    bool IsPremium,     
-    double DistanceInKm
+    bool IsPremium,
+    double DistanceInKm,
+    double AverageRating, 
+    int TotalReviews      
 );

@@ -39,10 +39,8 @@ public class AuthController : ControllerBase
         if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
             return BadRequest("The email is already registered.");
 
-        // Hash password using BCrypt for secure storage
         string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
-        // Create user using the Domain Entity constructor (Defaults to StandardUser)
         var user = new User(dto.Email, passwordHash, dto.FullName);
 
         _context.Users.Add(user);
@@ -87,19 +85,20 @@ public class AuthController : ControllerBase
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
-        {
-           new Claim(ClaimTypes.Email, user.Email),
-           new Claim(ClaimTypes.Name, user.FullName),
-           new Claim(ClaimTypes.Role, user.Role.ToString()),
-           new Claim("UserId", user.Id.ToString())
-       };
+ {
+
+    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    new Claim("FullName", user.FullName)
+};
 
         var token = new JwtSecurityToken(
             _config["Jwt:Issuer"],
             _config["Jwt:Audience"],
             claims,
             expires: DateTime.Now.AddHours(8),
-            signingCredentials: credentials); 
+            signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

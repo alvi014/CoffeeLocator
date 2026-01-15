@@ -16,4 +16,6 @@ public interface ICoffeeShopRepository
     Task<CoffeeShop?> GetByIdAsync(Guid id);
     Task<CoffeeShop?> GetByGoogleIdAsync(string googlePlaceId);
     Task AddAsync(CoffeeShop coffeeShop);
+    Task<IEnumerable<CoffeeShop>> GetAllWithReviewsAsync();
+    Task<CoffeeShop?> GetByIdWithReviewsAsync(Guid id);
 }
