@@ -1,10 +1,9 @@
 using CoffeeLocator.Api.Middleware;
 using CoffeeLocator.Application.Interfaces;
 using CoffeeLocator.Application.Services;
-using CoffeeLocator.Application.Validators.CoffeeShops;
+using CoffeeLocator.Application.Validators;
 using CoffeeLocator.Infrastructure;
 using CoffeeLocator.Infrastructure.Persistence;
-using CoffeeLocator.Infrastructure.Security; 
 using CoffeeLocator.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -18,25 +17,25 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Registro de Servicios de Aplicación (Inyección de Dependencias)
+// Application Services Injection
 builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();
-builder.Services.AddScoped<IAuthService, AuthService>(); 
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-// FluentValidation
+// FluentValidation for Reviews and CoffeeShops
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCoffeeShopValidator>();
 
-// 2. Registro de Infraestructura y Controladores
+// Infrastructure and Controllers registration
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// 3. Servicio para Obtener el Usuario Actual desde el Contexto HTTP
+// Current User Service and HttpContext Accessor
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-// --- CONFIGURACIÓN DE SEGURIDAD JWT ---
-
+// JWT Security Configuration
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(options =>
@@ -55,7 +54,6 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
-
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = ClaimTypes.Name
     };
@@ -63,14 +61,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// 4. Configuración de Swagger con Seguridad JWT
+// Swagger Configuration with JWT Security
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoffeeLocator API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token.",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -93,10 +91,20 @@ builder.Services.AddSwaggerGen(c =>
     if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
 });
 
+// CORS Policy definition
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-// --- MIDDLEWARE PIPELINE ---
-
+// Middleware Pipeline
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -107,13 +115,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// El orden aquí es sagrado:
-app.UseAuthentication(); 
-app.UseAuthorization();  
+// CORS must be called before Authentication and Authorization
+app.UseCors("AngularPolicy");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
-// 6. Inicialización de Base de Datos y Migraciones Automáticas
+// Database initialization and automatic migrations
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

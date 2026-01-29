@@ -4,6 +4,7 @@ using CoffeeLocator.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CoffeeLocator.Api.Controllers;
 
@@ -39,11 +40,13 @@ public class ReviewsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> PostReview(CreateReviewDto dto)
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                          ?? User.FindFirst("sub")?.Value;
+
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                       ?? User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value
+                       ?? User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
 
         if (string.IsNullOrEmpty(userIdClaim))
-            return Unauthorized("No se pudo identificar al usuario.");
+            return Unauthorized("No se pudo identificar al usuario en el token.");
 
         var userId = Guid.Parse(userIdClaim);
 
@@ -55,6 +58,7 @@ public class ReviewsController : ControllerBase
         );
 
         _context.Reviews.Add(review);
+
         await _context.SaveChangesAsync();
 
         return Ok(new { Message = "Reseña publicada con éxito", ReviewId = review.Id });
@@ -84,7 +88,7 @@ public class ReviewsController : ControllerBase
                     user.FullName,
                     review.Comment,
                     review.Rating,
-                    DateTime.Now
+                    review.CreatedAt 
                 ))
             .ToListAsync();
 

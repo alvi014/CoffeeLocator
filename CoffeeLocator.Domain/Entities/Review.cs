@@ -12,8 +12,12 @@ public class Review : BaseEntity
     public int Rating { get; private set; }
     public Guid CoffeeShopId { get; private set; }
 
+
+    public virtual CoffeeShop CoffeeShop { get; private set; }
+
+
     /// <summary>
-    /// Builds a new Review instance.
+    /// Build Professional
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="comment"></param>
@@ -21,6 +25,7 @@ public class Review : BaseEntity
     /// <param name="coffeeShopId"></param>
     public Review(Guid userId, string comment, int rating, Guid coffeeShopId)
     {
+        Id = Guid.NewGuid(); 
         UserId = userId;
         Comment = comment;
         Rating = rating;
