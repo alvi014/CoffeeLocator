@@ -1,117 +1,118 @@
 # CoffeeLocator ☕
 
-**CoffeeLocator** es una API RESTful robusta diseñada para que los amantes del café puedan descubrir cafeterías, gestionar sus favoritas y dejar reseñas auténticas. Construida con una arquitectura profesional en .NET, garantiza seguridad, escalabilidad y un manejo de datos eficiente.
+**CoffeeLocator** is a robust RESTful API designed for coffee lovers to discover coffee shops, manage their favorites, and leave genuine reviews. Built with a Clean Architecture approach, it emphasizes maintainability and scalability.
 
-🚀 **Estado del Proyecto:** Backend Base Completado (Seguridad + CRUD)
-
----
-
-## 📋 Tabla de Contenidos
-* [📦 Descripción General](#-descripción-general)
-* [🛠 Tecnologías y Herramientas](#-tecnologías-y-herramientas)
-* [🧭 Arquitectura del Sistema](#-arquitectura-del-sistema)
-* [🧪 Endpoints Principales](#-endpoints-principales)
-* [🔐 Seguridad y Autenticación](#-seguridad-y-autenticación)
-* [⚙️ Instalación](#-instalación)
-* [📬 Contacto](#-contacto)
+🚀 **Project Status:** Backend Base Completed (Security + CRUD)
 
 ---
 
-## 📦 Descripción General
-Este sistema permite centralizar la información de cafeterías locales. Los usuarios pueden registrarse para calificar sus experiencias, mientras que el sistema asegura la integridad de los datos mediante validaciones estrictas y un manejo global de excepciones.
-
-**Componentes clave:**
-* **Autenticación:** Sistema de Login/Registro basado en JWT.
-* **Reseñas:** Gestión de calificaciones con protección de identidad.
-* **Validación:** Uso de FluentValidation para asegurar datos de entrada correctos.
+## 📋 Table of Contents
+* [📦 Overview](#-overview)
+* [🛠 Technologies and Tools](#-technologies-and-tools)
+* [🧭 System Architecture](#-system-architecture)
+* [🧪 Key Endpoints](#-key-endpoints)
+* [🔐 Security and Authentication](#-security-and-authentication)
+* [⚙️ Installation](#-installation)
+* [📬 Contact](#-contact)
 
 ---
 
-## 🛠 Tecnologías y Herramientas
-* **Lenguaje:** C#
+## 📦 Overview
+This system centralizes the information of local coffee shops. Users can register to rate their experiences, ensuring data integrity and authenticity via a structured approach.
+
+**Key Components:**
+* **Authentication:** JWT-based Login/Registration system.
+* **Reviews:** Manage reviews with identity protection.
+* **Validation:** FluentValidation ensures proper input data.
+
+---
+
+## 🛠 Technologies and Tools
+* **Language:** C#
 * **Framework:** .NET 8.0
-* **Base de Datos:** SQL Server / Entity Framework Core (Code First)
-* **Seguridad:** JWT (JSON Web Tokens) & BCrypt.Net para hashing de contraseñas.
-* **Documentación:** Swagger / OpenAPI
-* **Validación:** FluentValidation
+* **Database:** SQL Server / Entity Framework Core (Code First)
+* **Security:** JWT (JSON Web Tokens) & BCrypt.Net for password hashing.
+* **Documentation:** Swagger / OpenAPI
+* **Validation:** FluentValidation
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## 🏗️ Project Architecture
 
-El proyecto sigue los principios de **Clean Architecture**, dividiendo las responsabilidades en 4 capas principales:
+The project follows the principles of **Clean Architecture**, dividing responsibilities into 4 main layers:
 
-* **Domain:** Contiene las entidades de negocio (`CoffeeShop`, `Review`), lógica de dominio y contratos de repositorios.
-* **Application:** Maneja los casos de uso, servicios de orquestación, DTOs y lógica de cálculo (Fórmula de Haversine para geolocalización).
-* **Infrastructure:** Implementación de la persistencia de datos con Entity Framework Core y repositorios específicos.
-* **API:** Controladores REST desacoplados que exponen los endpoints documentados con Swagger.
+* **Domain:** Contains business entities (`CoffeeShop`, `Review`), domain logic, and repository contracts.
+* **Application:** Manages use cases, orchestration services, DTOs, and calculation logic (Haversine formula for geolocation).
+* **Infrastructure:** Implements data persistence using Entity Framework Core and specific repositories.
+* **API:** Decoupled REST controllers exposing endpoints documented with Swagger.
 
-### 🚀 Funcionalidades Clave
-- **Búsqueda por Proximidad:** Cálculo de distancia en tiempo real basado en coordenadas geográficas.
-- **Rating Dinámico:** Cálculo automatizado de promedios de reseñas desde la entidad de dominio.
-
----
-
-## 🧪 Endpoints Principales
-
-### 🔐 Autenticación (Auth)
-* `POST /api/Auth/register` - Registro de nuevos usuarios.
-* `POST /api/Auth/login` - Obtención de Token JWT.
-
-### ☕ Cafeterías (CoffeeShops)
-* `GET /api/CoffeeShops` - Listado completo de locales.
-* `POST /api/CoffeeShops` - Agregar nueva cafetería (Protegido).
-
-### ⭐ Reseñas (Reviews)
-* `POST /api/Reviews` - Publicar una calificación (Requiere Auth).
-* `GET /api/Reviews/CoffeeShop/{id}` - Ver opiniones de un local.
+### 🚀 Key Features
+- **Proximity Search:** Real-time distance calculation based on geographic coordinates.
+- **Dynamic Rating:** Automated calculation of review averages from domain entities.
 
 ---
 
-## 🔐 Seguridad y Autenticación
-El sistema utiliza un flujo de seguridad moderno:
-1.  **Hashing:** Las contraseñas nunca se guardan en texto plano, se procesan con **BCrypt**.
-2.  **JWT:** Al iniciar sesión, el servidor genera un token firmado que expira en 8 horas.
-3.  **Middleware:** Un guardia de seguridad verifica el token en cada petición protegida.
+## 🧪 Key Endpoints
+
+### 🔐 Authentication (Auth)
+* `POST /api/Auth/register` - Register new users.
+* `POST /api/Auth/login` - Obtain JWT token.
+
+### ☕ Coffee Shops
+* `GET /api/CoffeeShops` - Full list of venues.
+* `POST /api/CoffeeShops` - Add a new coffee shop (Protected).
+
+### ⭐ Reviews
+* `POST /api/Reviews` - Submit a review (Requires Auth).
+* `GET /api/Reviews/CoffeeShop/{id}` - View reviews for a venue.
 
 ---
 
-## ⚙️ Instalación
+## 🔐 Security and Authentication
+The system uses a modern security workflow:
+1. **Hashing:** Passwords are never stored in plain text; they are processed using **BCrypt**.
+2. **JWT:** Upon login, the server generates a signed token that expires in 8 hours.
+3. **Middleware:** A security guard verifies the token on every protected request.
 
-1.  **Clona el repositorio:**
+---
+
+## ⚙️ Installation
+
+1. **Clone the repository:**
     ```bash
-    git clone [https://github.com/alvi014/CoffeeLocator.git](https://github.com/alvi014/CoffeeLocator.git)
+    git clone https://github.com/alvi014/CoffeeLocator.git
     cd CoffeeLocator
     ```
 
-2.  **Configura la Base de Datos:**
-    Actualiza la cadena de conexión en `appsettings.json`:
+2. **Configure the Database:**
+    Update the connection string in `appsettings.json`:
     ```json
-    "DefaultConnection": "Server=TU_SERVIDOR;Database=CoffeeLocatorDb;..."
+    "DefaultConnection": "Server=YOUR_SERVER;Database=CoffeeLocatorDb;..."
     ```
 
-3.  **Ejecuta las migraciones:**
+3. **Run migrations:**
     ```bash
     dotnet ef database update
     ```
 
-4.  **Inicia la API:**
+4. **Start the API:**
     ```bash
     dotnet run --project CoffeeLocator.Api
     ```
 
 ---
 
-## ✨ Características Destacadas
-* **Global Exception Handling:** Respuesta JSON estandarizada para cualquier error del servidor.
-* **Auto-Validation:** Las peticiones se validan automáticamente antes de llegar al controlador.
-* **Identity Extraction:** El sistema reconoce automáticamente al usuario mediante los *Claims* del token.
+## ✨ Notable Features
+* **Global Exception Handling:** Standardized JSON response for any server errors.
+* **Auto-Validation:** Requests are automatically validated before reaching the controller.
+* **Identity Extraction:** The system automatically recognizes the user based on the token claims.
 
 ---
 
-## 📬 Contacto
-👨‍💻 **Desarrollador:** Alvaro Victor Zamora
-📧 **Correo:** alvarovictor06@gmail.com
+## 📬 Contact
+👨‍💻 **Developer:** Alvaro Victor Zamora  
+📧 **Email:** alvarovictor06@gmail.com
 
 ---
-Proyecto creado con fines educativos y para la comunidad cafetalera.
+
+Project created for educational purposes and the coffee lover community.
