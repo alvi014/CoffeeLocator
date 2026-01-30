@@ -1,8 +1,8 @@
-# CoffeeLocator ☕
+# CoffeeLocator ☕ *(Currently under development)*
 
 **CoffeeLocator** is a robust RESTful API designed for coffee lovers to discover coffee shops, manage their favorites, and leave genuine reviews. Built with a Clean Architecture approach, it emphasizes maintainability and scalability.
 
-🚀 **Project Status:** Backend Base Completed (Security + CRUD)
+🚀 **Project Status:** Backend API Completed (Security + CRUD functionality)
 
 ---
 
@@ -19,6 +19,8 @@
 
 ## 📦 Overview
 This system centralizes the information of local coffee shops. Users can register to rate their experiences, ensuring data integrity and authenticity via a structured approach.
+
+The API is fully functional, offering features like user authentication, coffee shop management, and reviews submission.
 
 **Key Components:**
 * **Authentication:** JWT-based Login/Registration system.
