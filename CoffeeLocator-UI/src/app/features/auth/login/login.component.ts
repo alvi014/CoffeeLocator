@@ -28,8 +28,8 @@ onSubmit() {
 
     this.authService.login(email, password).subscribe({
       next: () => {
-        localStorage.setItem('auth_token', 'fake-jwt');
-        this.router.navigate(['/map']);
+        
+        this.router.navigate(['/map']); 
       },
       error: (err: any) => {
         this.errorMessage = 'Credenciales incorrectas';
