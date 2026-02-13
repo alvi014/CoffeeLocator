@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-coffee-dark flex items-center justify-center p-6 relative overflow-hidden font-sans">
+  <div class="absolute inset-0 z-0">
+    <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070" 
+         class="w-full h-full object-cover opacity-20 scale-110 animate-[subtle-zoom_30s_infinite]" alt="background">
+    <div class="absolute inset-0 bg-gradient-to-t from-coffee-dark via-transparent to-coffee-dark"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-md">
+    <div class="bg-black/40 backdrop-blur-2xl border border-white/10 p-10 shadow-2xl rounded-sm">
+      
+      <div class="mb-10 text-center">
+        <h2 class="text-white text-4xl font-black uppercase tracking-tighter italic">
+          Unirse al <span class="text-coffee-gold not-italic">Gremio</span>
+        </h2>
+        <p class="text-zinc-500 text-xs mt-2 tracking-[3px] uppercase">Registro de Catador</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        
+        <div class="space-y-1">
+          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Nombre Completo</label>
+          <input formControlName="nombre" type="text" 
+            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
+            [class.border-white/10]="!isInvalid('nombre') && !isValid('nombre')"
+            [class.border-red-500/50]="isInvalid('nombre')"
+            [class.border-coffee-gold]="isValid('nombre')"
+            placeholder="Ej. Juan Pérez">
+          <p *ngIf="isInvalid('nombre')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Mínimo 3 caracteres</p>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Correo Electrónico</label>
+          <input formControlName="email" type="email" 
+            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
+            [class.border-white/10]="!isInvalid('email') && !isValid('email')"
+            [class.border-red-500/50]="isInvalid('email')"
+            [class.border-coffee-gold]="isValid('email')"
+            placeholder="tu@email.com">
+          <p *ngIf="isInvalid('email')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Correo no válido</p>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Contraseña</label>
+          <input formControlName="password" type="password" 
+            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
+            [class.border-white/10]="!isInvalid('password') && !isValid('password')"
+            [class.border-red-500/50]="isInvalid('password')"
+            [class.border-coffee-gold]="isValid('password')"
+            placeholder="••••••••">
+          <p *ngIf="isInvalid('password')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Mínimo 6 caracteres</p>
+        </div>
+
+        <button type="submit" 
+          class="w-full bg-coffee-gold py-5 text-coffee-dark font-black uppercase tracking-widest text-sm hover:bg-white transition-all transform active:scale-95 disabled:opacity-20 disabled:grayscale mt-6 shadow-lg shadow-coffee-gold/20">
+          Crear Perfil
+        </button>
+      </form>
+
+      <div class="mt-8 text-center border-t border-white/5 pt-6">
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest">
+          ¿Ya tienes cuenta? 
+          <a routerLink="/login" class="text-white hover:text-coffee-gold transition-colors font-black ml-1">Ingresar aquí</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
