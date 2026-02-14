@@ -12,12 +12,12 @@
 - [x] **UI/UX:** Create Register component (Pending).
 - [x] **Logic:** Implement an `AuthGuard` to protect authenticated-only routes.
 - [x] **Connectivity:** Connect `AuthService` with real .NET Backend (Endpoint: `/api/auth/login`).
-- [ ] **Shared:** Update `HeaderComponent` to react to `AuthService` state (Display Logout button vs Login).
-- [ ] **Features:** - Setup the `/coffee-shop/:id` route.
+- [x] **Shared:** Update `HeaderComponent` to react to `AuthService` state (Display Logout button vs Login).
+- [x] **Features:** - Setup the `/coffee-shop/:id` route.
     - Implement a service to fetch a single coffee shop by ID.
 
 ## 🚀 Definition of Done (DoD)
-- [ ] Users can navigate between the Map and their Profile without losing state.
-- [ ] The Header is consistent and dynamic (shows/hides options based on Auth).
-- [ ] Registration flow is complete and saves users in the DB.
-- [ ] Clicking a marker on the map redirects to the correct Detail view.
+- [x] Users can navigate between the Map and their Profile without losing state.
+- [x] The Header is consistent and dynamic (shows/hides options based on Auth).
+- [x] Registration flow is complete and saves users in the DB.
+- [x] Clicking a marker on the map redirects to the correct Detail view.
