@@ -7,21 +7,35 @@ namespace CoffeeLocator.Infrastructure.Persistence
     {
         private readonly AppDbContext _context;
 
-        // Properties defined in your interface
         public ICoffeeShopRepository CoffeeShops { get; }
         public IVisitRepository Visits { get; }
-        public IAchievementRepository Achievements { get; }
+        public IAchievementRepository Achievements { get; } 
+        public IUserRepository Users { get; }
+        public IReviewRepository Reviews { get; }
 
+        /// <summary>
+        /// Builder of inyection dependencys
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="coffeeShops"></param>
+        /// <param name="visits"></param>
+        /// <param name="achievements"></param>
+        /// <param name="users"></param>
+        /// <param name="reviews"></param>
         public UnitOfWork(
             AppDbContext context,
             ICoffeeShopRepository coffeeShops,
             IVisitRepository visits,
-            IAchievementRepository achievements)
+            IAchievementRepository achievements,
+            IUserRepository users, 
+            IReviewRepository reviews) 
         {
             _context = context;
             CoffeeShops = coffeeShops;
             Visits = visits;
             Achievements = achievements;
+            Users = users;
+            Reviews = reviews;
         }
 
         public async Task<int> SaveChangesAsync()

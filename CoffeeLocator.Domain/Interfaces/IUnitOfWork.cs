@@ -15,5 +15,7 @@ public interface IUnitOfWork : IDisposable
     ICoffeeShopRepository CoffeeShops { get; }
     IVisitRepository Visits { get; }
     IAchievementRepository Achievements { get; }
+    IUserRepository Users { get; }
+    IReviewRepository Reviews { get; }
     Task<int> SaveChangesAsync();
 }

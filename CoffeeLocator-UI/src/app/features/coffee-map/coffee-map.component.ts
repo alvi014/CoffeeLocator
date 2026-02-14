@@ -9,7 +9,7 @@ import { CoffeeShopNearby } from '../../shared/models/coffee-shop.model';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './coffee-map.component.html',
-  styleUrl: './coffee-map.component.scss'
+  styleUrl: './coffee-map.component.css'
 })
 export class CoffeeMapComponent implements OnInit, AfterViewInit {
   private map!: L.Map;
