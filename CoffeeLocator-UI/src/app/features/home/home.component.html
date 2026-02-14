@@ -1,0 +1,47 @@
+<div class="relative min-h-screen bg-coffee-dark overflow-hidden font-sans">
+  
+  <div class="absolute inset-0 z-0">
+    <div *ngFor="let img of images; let i = index" 
+         class="absolute inset-0 w-full h-full transition-opacity duration-[2000ms] ease-in-out"
+         [style.opacity]="i === currentImageIndex ? '1' : '0'">
+      <img [src]="img" 
+           class="w-full h-full object-cover scale-110 animate-[subtle-zoom_20s_infinite]" 
+           alt="experiencia de café">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-r from-coffee-dark via-coffee-dark/50 to-transparent z-10"></div>
+    <div class="absolute inset-0 bg-black/30 z-10"></div> 
+  </div>
+
+  <main class="relative z-20 flex flex-col justify-center min-h-screen px-10 md:px-24 max-w-5xl">
+   <span class="text-coffee-gold font-black uppercase tracking-[6px] text-xs mb-6 animate-in fade-in slide-in-from-left duration-700">
+      Premium Coffee Experience
+    </span>
+    
+    <h1 class="text-white text-7xl md:text-9xl font-black leading-none tracking-tighter mb-8 uppercase italic">
+      El Tueste <br>
+      <span class="text-coffee-gold not-italic">Perfecto.</span>
+    </h1>
+
+    <p class="text-zinc-300 text-lg md:text-xl max-w-md mb-12 leading-relaxed font-light border-l-2 border-coffee-gold pl-6 italic">
+      Explora las cafeterías de especialidad más exclusivas de Costa Rica. Una comunidad para los amantes del grano de oro.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4">
+      <button routerLink="/register" 
+        class="group relative px-12 py-5 bg-coffee-gold overflow-hidden transition-all duration-300 active:scale-95 shadow-[0_10px_30px_-10px_rgba(217,154,78,0.5)]">
+        <div class="absolute inset-0 w-0 bg-white transition-all duration-300 group-hover:w-full opacity-10"></div>
+        <span class="relative z-10 text-coffee-dark font-black uppercase tracking-widest text-sm italic">Unirse al Gremio</span>
+      </button>
+
+      <button routerLink="/login" 
+        class="group relative px-12 py-5 border border-white/30 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-white active:scale-95">
+        <div class="absolute inset-0 translate-y-full bg-white transition-all duration-300 group-hover:translate-y-0"></div>
+        <span class="relative z-10 text-white font-black uppercase tracking-widest text-sm group-hover:text-coffee-dark italic">Ingresar</span>
+      </button>
+    </div>
+  </main>
+
+<div class="absolute right-0 top-0 h-full flex items-center pr-10 hidden lg:flex z-20">
+    <p class="rotate-90 text-white/5 text-9xl font-black tracking-tighter select-none">EST. 2026</p>
+  </div>
+</div>
