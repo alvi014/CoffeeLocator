@@ -5,61 +5,96 @@
     <div class="absolute inset-0 bg-gradient-to-t from-coffee-dark via-transparent to-coffee-dark"></div>
   </div>
 
-  <div class="relative z-10 w-full max-w-md">
-    <div class="bg-black/40 backdrop-blur-2xl border border-white/10 p-10 shadow-2xl rounded-sm">
+  <div class="relative z-10 w-full max-w-lg">
+    <div class="bg-black/60 backdrop-blur-2xl border border-white/10 p-12 shadow-2xl rounded-sm">
       
       <div class="mb-10 text-center">
-        <h2 class="text-white text-4xl font-black uppercase tracking-tighter italic">
+        <h2 class="text-white text-5xl font-black uppercase tracking-tighter italic">
           Unirse al <span class="text-coffee-gold not-italic">Gremio</span>
         </h2>
-        <p class="text-zinc-500 text-xs mt-2 tracking-[3px] uppercase">Registro de Catador</p>
+        <p class="text-zinc-400 text-sm mt-3 tracking-[4px] uppercase font-bold">Registro de Catador</p>
       </div>
 
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <div *ngIf="mensajeFeedback" 
+           class="mb-6 p-4 border backdrop-blur-md rounded-sm text-center animate-pulse"
+           [ngClass]="tipoFeedback === 'success' ? 'bg-coffee-gold/10 border-coffee-gold text-coffee-gold' : 'bg-red-500/10 border-red-500/50 text-red-400'">
+        <p class="text-xs font-black uppercase tracking-[2px]">{{ mensajeFeedback }}</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
         
-        <div class="space-y-1">
-          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Nombre Completo</label>
+        <div class="space-y-2">
+          <label class="block text-coffee-gold text-xs font-black uppercase tracking-[2px]">Nombre Completo</label>
           <input formControlName="nombre" type="text" 
-            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
-            [class.border-white/10]="!isInvalid('nombre') && !isValid('nombre')"
-            [class.border-red-500/50]="isInvalid('nombre')"
+            class="w-full bg-white/5 border px-5 py-4 text-white text-lg focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
             [class.border-coffee-gold]="isValid('nombre')"
-            placeholder="Ej. Juan Pérez">
-          <p *ngIf="isInvalid('nombre')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Mínimo 3 caracteres</p>
+            [class.border-red-500/50]="isInvalid('nombre')"
+            placeholder="Ej. Barney Saldivar">
         </div>
 
-        <div class="space-y-1">
-          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Correo Electrónico</label>
+        <div class="space-y-2">
+          <label class="block text-coffee-gold text-xs font-black uppercase tracking-[2px]">Correo Electrónico</label>
           <input formControlName="email" type="email" 
-            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
-            [class.border-white/10]="!isInvalid('email') && !isValid('email')"
-            [class.border-red-500/50]="isInvalid('email')"
+            class="w-full bg-white/5 border px-5 py-4 text-white text-lg focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
             [class.border-coffee-gold]="isValid('email')"
-            placeholder="tu@email.com">
-          <p *ngIf="isInvalid('email')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Correo no válido</p>
+            [class.border-red-500/50]="isInvalid('email')"
+            placeholder="barney@ejemplo.com">
         </div>
 
-        <div class="space-y-1">
-          <label class="block text-coffee-gold text-[10px] font-black uppercase tracking-widest">Contraseña</label>
+        <div class="space-y-2">
+          <label class="block text-coffee-gold text-xs font-black uppercase tracking-[2px]">Contraseña</label>
           <input formControlName="password" type="password" 
-            class="w-full bg-white/5 border px-4 py-4 text-white focus:outline-none transition-all duration-300 font-light placeholder:text-zinc-700"
-            [class.border-white/10]="!isInvalid('password') && !isValid('password')"
-            [class.border-red-500/50]="isInvalid('password')"
-            [class.border-coffee-gold]="isValid('password')"
+            class="w-full bg-white/5 border px-5 py-4 text-white text-lg focus:outline-none transition-all duration-300 font-light"
+            [class.border-coffee-gold]="f['password'].valid"
+            [class.border-red-500/50]="f['password'].invalid && f['password'].touched"
             placeholder="••••••••">
-          <p *ngIf="isInvalid('password')" class="text-[10px] text-red-500 uppercase font-bold tracking-tighter">Mínimo 6 caracteres</p>
+          
+          <div class="flex flex-col gap-1 mt-2 ml-1">
+            <div class="flex items-center gap-2">
+              <div class="w-1.5 h-1.5 rounded-full" [class]="f['password'].errors?.['minlength'] ? 'bg-zinc-600' : 'bg-emerald-500'"></div>
+              <p [class]="f['password'].errors?.['minlength'] ? 'text-zinc-500' : 'text-emerald-500'" class="text-[10px] uppercase font-bold tracking-widest">
+                Mínimo 8 caracteres
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-1.5 h-1.5 rounded-full" [class]="f['password'].errors?.['pattern'] ? 'bg-zinc-600' : 'bg-emerald-500'"></div>
+              <p [class]="f['password'].errors?.['pattern'] ? 'text-zinc-500' : 'text-emerald-500'" class="text-[10px] uppercase font-bold tracking-widest">
+                Al menos una Mayúscula
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-coffee-gold text-xs font-black uppercase tracking-[2px]">Confirmar Contraseña</label>
+          <input formControlName="confirmPassword" type="password" 
+            class="w-full bg-white/5 border px-5 py-4 text-white text-lg focus:outline-none transition-all duration-300 font-light"
+            [class.border-emerald-500]="passwordsMatch"
+            [class.border-red-500/50]="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched"
+            placeholder="••••••••">
+          
+          <p *ngIf="passwordsMatch" class="text-[10px] text-emerald-500 uppercase font-black tracking-widest mt-1 ml-1 animate-pulse">
+            ✓ Las contraseñas coinciden
+          </p>
+          <p *ngIf="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched" class="text-[10px] text-red-500 uppercase font-black tracking-widest mt-1 ml-1">
+            × Las contraseñas no coinciden
+          </p>
         </div>
 
         <button type="submit" 
-          class="w-full bg-coffee-gold py-5 text-coffee-dark font-black uppercase tracking-widest text-sm hover:bg-white transition-all transform active:scale-95 disabled:opacity-20 disabled:grayscale mt-6 shadow-lg shadow-coffee-gold/20">
-          Crear Perfil
+          [disabled]="registerForm.invalid || cargando"
+          class="w-full bg-coffee-gold py-6 text-coffee-dark font-black uppercase tracking-[4px] text-lg hover:bg-white transition-all transform active:scale-95 disabled:opacity-20 mt-8 shadow-2xl shadow-coffee-gold/20">
+          <span *ngIf="!cargando">Crear Perfil</span>
+          <div *ngIf="cargando" class="flex justify-center">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-coffee-dark"></div>
+          </div>
         </button>
       </form>
 
-      <div class="mt-8 text-center border-t border-white/5 pt-6">
-        <p class="text-zinc-500 text-[10px] uppercase tracking-widest">
+      <div class="mt-10 text-center border-t border-white/5 pt-8">
+        <p class="text-zinc-400 text-sm uppercase tracking-widest">
           ¿Ya tienes cuenta? 
-          <a routerLink="/login" class="text-white hover:text-coffee-gold transition-colors font-black ml-1">Ingresar aquí</a>
+          <a routerLink="/login" class="text-white hover:text-coffee-gold transition-colors font-black ml-2 underline underline-offset-4">Ingresar aquí</a>
         </p>
       </div>
     </div>

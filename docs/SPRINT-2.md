@@ -9,7 +9,7 @@
 
 ## 🛠️ Planned Tasks
 - [x] **UI/UX:** Create Login component using Angular `ReactiveForms` and validations.
-- [ ] **UI/UX:** Create Register component (Pending).
+- [x] **UI/UX:** Create Register component (Pending).
 - [x] **Logic:** Implement an `AuthGuard` to protect authenticated-only routes.
 - [x] **Connectivity:** Connect `AuthService` with real .NET Backend (Endpoint: `/api/auth/login`).
 - [ ] **Shared:** Update `HeaderComponent` to react to `AuthService` state (Display Logout button vs Login).
