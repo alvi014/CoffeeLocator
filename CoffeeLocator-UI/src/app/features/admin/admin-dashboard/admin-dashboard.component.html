@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-stone-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-stone-900">Coffee Shop Administration</h1>
+        <p class="text-stone-500">Manage the guild's authorized coffee establishments</p>
+      </div>
+      <button 
+        (click)="openCreateModal()"
+        class="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2">
+        <span class="text-xl">+</span> Add New Shop
+      </button>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+      <table class="w-full text-left border-collapse">
+        <thead class="bg-stone-100 border-b border-stone-200">
+          <tr>
+            <th class="px-6 py-4 text-sm font-semibold text-stone-600">Coffee Shop</th>
+            <th class="px-6 py-4 text-sm font-semibold text-stone-600">Location</th>
+            <th class="px-6 py-4 text-sm font-semibold text-stone-600">Rating</th>
+            <th class="px-6 py-4 text-sm font-semibold text-stone-600">Status</th>
+            <th class="px-6 py-4 text-sm font-semibold text-stone-600 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-100">
+          <tr *ngFor="let shop of shops" class="hover:bg-stone-50 transition">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <img [src]="shop.imageUrl || 'assets/no-image.png'" class="w-10 h-10 rounded-lg object-cover border border-stone-200">
+                <span class="font-medium text-stone-800">{{ shop.name }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-stone-600 text-sm">{{ shop.address }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-1 text-amber-500">
+                <span>⭐</span> <span class="font-semibold text-stone-700">{{ shop.averageRating }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span *ngIf="shop.isPremium" class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-bold uppercase tracking-wider border border-amber-200">
+                Premium
+              </span>
+              <span *ngIf="!shop.isPremium" class="bg-stone-100 text-stone-600 text-xs px-2 py-1 rounded-full border border-stone-200">
+                Standard
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex justify-end gap-2">
+                <button (click)="editShop(shop)" class="p-2 text-stone-400 hover:text-amber-700 transition">
+                  ✏️
+                </button>
+                <button (click)="deleteShop(shop.id)" class="p-2 text-stone-400 hover:text-red-600 transition">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="shops.length === 0" class="p-20 text-center">
+        <p class="text-stone-400">No coffee shops found. Start by adding one!</p>
+      </div>
+    </div>
+  </div>
+</div>

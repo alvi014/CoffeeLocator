@@ -66,6 +66,17 @@ public class CoffeeShopRepository : ICoffeeShopRepository
     }
 
     /// <summary>
+    /// Metod <see langword="for"/> updating an existing CoffeeShop in the database. It marks the entity as modified and saves changes to persist the update.
+    /// </summary>
+    /// <param name="coffeeShop"></param>
+    /// <returns></returns>
+    public async Task UpdateAsync(CoffeeShop coffeeShop)
+    {
+        _context.CoffeeShops.Update(coffeeShop);
+        await Task.CompletedTask; 
+    }
+
+    /// <summary>
     /// Metod <see langword="for"/> updating an existing CoffeeShop in the database.
     /// </summary>
     /// <param name="coffeeShop"></param>

@@ -1,0 +1,56 @@
+<div class="bg-white p-6 rounded-xl shadow-lg border border-stone-200">
+  <h2 class="text-2xl font-bold text-stone-800 mb-6">
+    {{ shopToEdit ? 'Edit Coffee Shop' : 'Register New Coffee Shop' }}
+  </h2>
+
+  <form [formGroup]="shopForm" (ngSubmit)="save()" class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col">
+        <label class="text-sm font-semibold text-stone-600 mb-1">Name</label>
+        <input type="text" formControlName="name" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div class="flex flex-col">
+        <label class="text-sm font-semibold text-stone-600 mb-1">Google Place ID</label>
+        <input type="text" formControlName="googlePlaceId" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-sm font-semibold text-stone-600 mb-1">Address</label>
+      <input type="text" formControlName="address" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none">
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-sm font-semibold text-stone-600 mb-1">Description</label>
+      <textarea formControlName="description" rows="3" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex flex-col">
+        <label class="text-sm font-semibold text-stone-600 mb-1">Latitude</label>
+        <input type="number" step="any" formControlName="latitude" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div class="flex flex-col">
+        <label class="text-sm font-semibold text-stone-600 mb-1">Longitude</label>
+        <input type="number" step="any" formControlName="longitude" class="p-2 border rounded-md focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 py-2">
+      <input type="checkbox" formControlName="isPremium" id="premium-check" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+      <label for="premium-check" class="text-sm font-medium text-stone-700">Premium Establishment</label>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-6 border-t border-stone-100">
+      <button type="button" (click)="formClosed.emit()" class="px-4 py-2 text-stone-500 hover:text-stone-700 font-medium">
+        Cancel
+      </button>
+      <button 
+        type="submit" 
+        [disabled]="shopForm.invalid || isSubmitting"
+        class="px-6 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800 disabled:bg-stone-300 transition shadow-sm">
+        {{ isSubmitting ? 'Saving...' : (shopToEdit ? 'Update Shop' : 'Create Shop') }}
+      </button>
+    </div>
+  </form>
+</div>
