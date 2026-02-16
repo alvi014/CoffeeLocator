@@ -32,7 +32,9 @@ public class CoffeeShopService : ICoffeeShopService
             var distance = CalculateHaversine(userLat, userLng, s.Latitude, s.Longitude);
             var dto = _mapper.Map<CoffeeShopNearbyDto>(s);
 
-            return dto with { DistanceInKm = Math.Round(distance, 2) };
+            dto.DistanceInKm = Math.Round(distance, 2);
+
+            return dto;
         })
         .Where(s => s.DistanceInKm <= radiusInKm)
         .OrderBy(s => s.DistanceInKm)

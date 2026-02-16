@@ -20,7 +20,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- AutoMapper configuration ---
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
 
 // --- Application Services Injection ---
 builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();

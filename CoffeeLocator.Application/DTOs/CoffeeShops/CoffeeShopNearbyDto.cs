@@ -1,14 +1,13 @@
-﻿namespace CoffeeLocator.Application.DTOs.CoffeeShops;
-
-public record CoffeeShopNearbyDto(
-    Guid Id,
-    string Name,
-    string Address,
-    double Latitude,
-    double Longitude,
-    double DistanceInKm,
-    double AverageRating,
-    int TotalReviews,
-    bool IsPremium,
-    string? ImageUrl
-);
+﻿public class CoffeeShopNearbyDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public double DistanceInKm { get; set; }
+    public double AverageRating { get; set; }
+    public int TotalReviews { get; set; }
+    public bool IsPremium { get; set; }
+    public string? ImageUrl { get; set; }
+}

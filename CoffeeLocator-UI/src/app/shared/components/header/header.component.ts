@@ -18,7 +18,7 @@ export class HeaderComponent {
     private router: Router,
   ) {}
   // Check if the current page is login or register
-  isAuthPage(): boolean {
+ isAuthPage(): boolean {
     return this.router.url === '/login' || this.router.url === '/register';
   }
   // Get name user from local storage
@@ -27,7 +27,7 @@ export class HeaderComponent {
     return user.name || 'Coffee Lover';
   }
   // Logout user and navigate to login page
-  onLogout() {
+onLogout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
