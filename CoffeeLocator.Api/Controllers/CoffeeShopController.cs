@@ -26,8 +26,8 @@ public class CoffeeShopsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CoffeeShopNearbyDto>>> GetCoffeeShops()
     {
-        // Usamos 0,0 o coordenadas por defecto para el listado general
-        var shops = await _coffeeShopService.GetNearbyShopsAsync(0, 0, 20000); // Radio grande para traer todas
+        
+        var shops = await _coffeeShopService.GetNearbyShopsAsync(0, 0, 20000); 
         return Ok(shops);
     }
 
@@ -40,7 +40,6 @@ public class CoffeeShopsController : ControllerBase
     public async Task<ActionResult<CoffeeShopDetailDto>> GetCoffeeShop(Guid id)
     {
         var coffeeShop = await _coffeeShopService.GetShopByIdAsync(id);
-
         if (coffeeShop == null) return NotFound();
 
         return Ok(coffeeShop);
@@ -66,16 +65,39 @@ public class CoffeeShopsController : ControllerBase
     /// <param name="dto">The data required to create a coffee shop.</param>
     /// <returns>The newly created coffee shop details.</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")] 
     public async Task<ActionResult<CoffeeShopDetailDto>> PostCoffeeShop(CreateCoffeeShopDto dto)
     {
         var result = await _coffeeShopService.CreateCoffeeShopAsync(dto);
-
         return CreatedAtAction(nameof(GetCoffeeShop), new { id = result.Id }, result);
+    }
+
+    /// <summary>
+    /// Updates an existing coffee shop information. Only accessible to users with the "Admin" role.
+    /// </summary>
+    /// <param name="id">The GUID of the coffee shop to update.</param>
+    /// <param name="dto">The updated data for the coffee shop.</param>
+    /// <returns>No content if successful, otherwise an error message.</returns>
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateCoffeeShop(Guid id, UpdateCoffeeShopDto dto)
+    {
+        if (id != dto.Id)
+        {
+            return BadRequest("The ID in the URL does not match the ID in the body.");
+        }
+
+        var result = await _coffeeShopService.UpdateShopAsync(dto);
+        if (!result) return NotFound("The coffee shop was not found.");
+
+        return NoContent();
     }
 
     /// <summary>
     /// Deletes a coffee shop by its unique identifier. Only accessible to users with the "Admin" role.
     /// </summary>
+    /// <param name="id">The GUID of the shop to delete.</param>
+    /// <returns>No content if successful, otherwise an error message.</returns>
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)

@@ -2,8 +2,10 @@ using CoffeeLocator.Api.Middleware;
 using CoffeeLocator.Application.Interfaces;
 using CoffeeLocator.Application.Services;
 using CoffeeLocator.Application.Validators;
+using CoffeeLocator.Domain.Interfaces;
 using CoffeeLocator.Infrastructure;
 using CoffeeLocator.Infrastructure.Persistence;
+using CoffeeLocator.Infrastructure.Security;
 using CoffeeLocator.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -17,25 +19,34 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Application Services Injection
+// --- AutoMapper configuration ---
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+
+// --- Application Services Injection ---
 builder.Services.AddScoped<ICoffeeShopService, CoffeeShopService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// FluentValidation for Reviews and CoffeeShops
+// --- Unit of Work Registration ---
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// --- FluentValidation for Reviews and CoffeeShops ---
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateReviewValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCoffeeShopValidator>();
 
-// Infrastructure and Controllers registration
+// --- Infrastructure and Controllers registration ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Registro del DbContext y servicios de infraestructura (JwtService, etc.)uí.
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Current User Service and HttpContext Accessor
+// --- Current User Service and HttpContext Accessor ---
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-// JWT Security Configuration
+// --- JWT Security Configuration ---
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(options =>
@@ -61,7 +72,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Swagger Configuration with JWT Security
+// --- Swagger Configuration with JWT Security ---
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CoffeeLocator API", Version = "v1" });
@@ -91,7 +102,7 @@ builder.Services.AddSwaggerGen(c =>
     if (File.Exists(xmlPath)) c.IncludeXmlComments(xmlPath);
 });
 
-// CORS Policy definition
+// --- CORS Policy definition ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularPolicy", policy =>
@@ -104,7 +115,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Middleware Pipeline
+// --- Middleware Pipeline Order is Critical ---
+
+//  First, handle exceptions
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -113,17 +126,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// CORS must be called before Authentication and Authorization
+// CORS MUST be before HttpsRedirection and Routing
 app.UseCors("AngularPolicy");
 
+//  Then handle HTTPS redirection
+app.UseHttpsRedirection();
+
+// Then Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Database initialization and automatic migrations
+// --- Database initialization ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

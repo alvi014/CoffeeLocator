@@ -11,21 +11,8 @@ import { routes } from './app.routes';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    /**
-     * Enables Zone.js change detection with event coalescing 
-     * for better performance in complex UIs.
-     */
     provideZoneChangeDetection({ eventCoalescing: true }),
-
-    /**
-     * Registers the application routes defined in app.routes.ts.
-     */
     provideRouter(routes),
-
-    /**
-     * Provides the HttpClient service globally, allowing components
-     * and services to communicate with the C# Backend.
-     */
     provideHttpClient(withInterceptors([jwtInterceptor]))
   ]
 };

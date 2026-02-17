@@ -18,5 +18,6 @@ public interface ICoffeeShopRepository
     Task AddAsync(CoffeeShop coffeeShop);
     Task<IEnumerable<CoffeeShop>> GetAllWithReviewsAsync();
     Task<CoffeeShop?> GetByIdWithReviewsAsync(Guid id);
+    Task UpdateAsync(CoffeeShop coffeeShop);
     Task DeleteAsync(CoffeeShop coffeeShop);
 }

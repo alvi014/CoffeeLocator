@@ -1,44 +1,86 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { CoffeeShopNearby } from '../../shared/models/coffee-shop.model';
+import { 
+  CoffeeShopNearby, 
+  CoffeeShopDetail, 
+  CreateCoffeeShop, 
+  UpdateCoffeeShop 
+} from '../../shared/models/coffee-shop.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoffeeShopService {
-  private apiUrl = 'http://localhost:5224/api/coffeeshops'; 
+  private apiUrl = 'https://localhost:7283/api/coffeeshops'; 
 
   constructor(private http: HttpClient) {}
 
   /**
-   * Metod for locatizate coffeeshops
+   * Retrieves all coffee shops (Admin/General use)
    */
+  getAllShops(): Observable<CoffeeShopNearby[]> {
+    return this.http.get<CoffeeShopNearby[]>(this.apiUrl);
+  }
 
-  getNearbyShops(lat: number, lng: number): Observable<CoffeeShopNearby[]> {
-    return this.http.get<CoffeeShopNearby[]>(`${this.apiUrl}/nearby?latitude=${lat}&longitude=${lng}`)
+  /**
+   * Retrieves coffee shops based on proximity to the user.
+   * Parameter names MUST match the Backend Action parameters.
+   */
+  getNearbyShops(lat: number, lng: number, radius: number = 5): Observable<CoffeeShopNearby[]> {
+    const params = new HttpParams()
+      .set('userLat', lat.toString())
+      .set('userLng', lng.toString()) 
+      .set('radiusInKm', radius.toString()); 
+
+    return this.http.get<CoffeeShopNearby[]>(`${this.apiUrl}/nearby`, { params })
       .pipe(
-        map(shops => {
-          // Si la API devuelve vacío (BD vacía), usamos datos falsos para probar
-          if (!shops || shops.length === 0) {
-            console.warn('⚠️ API devolvió 0 resultados. Usando MOCK DATA para desarrollo.');
-            return this.getMockShops();
-          }
-          return shops;
-        }),
-        catchError(err => {
-          console.error('❌ Error API. Usando MOCK DATA.', err);
+        map(shops => (shops?.length > 0 ? shops : this.getMockShops())),
+        catchError((err) => {
+          console.error('Backend error, loading mocks:', err);
           return of(this.getMockShops());
         })
       );
   }
 
+  /**
+   * Retrieves full details of a specific shop
+   */
+  getShopById(id: string): Observable<CoffeeShopDetail> {
+    return this.http.get<CoffeeShopDetail>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Admin: Creates a new coffee shop
+   */
+  createShop(shop: CreateCoffeeShop): Observable<CoffeeShopDetail> {
+    return this.http.post<CoffeeShopDetail>(this.apiUrl, shop);
+  }
+
+  /**
+   * Admin: Updates an existing coffee shop.
+   * Matches the route [HttpPut("{id}")]
+   */
+  updateShop(id: string, shop: UpdateCoffeeShop): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, shop);
+  }
+
+  /**
+   * Admin: Deletes a coffee shop
+   */
+  deleteShop(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Fallback data for development when the database is empty or the API fails.
+   */
   private getMockShops(): CoffeeShopNearby[] {
     return [
       {
         id: '1',
-        name: 'Café de Prueba 1',
+        name: 'Café de Prueba 1 (Mock)',
         address: 'Frente al parque, Aguas Zarcas',
         latitude: 10.3750,
         longitude: -84.3440,
@@ -47,18 +89,6 @@ export class CoffeeShopService {
         totalReviews: 12,
         isPremium: true,
         imageUrl: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200'
-      },
-      {
-        id: '2',
-        name: 'Espresso Test',
-        address: '200m Norte de la Iglesia',
-        latitude: 10.3760,
-        longitude: -84.3420,
-        distanceInKm: 0.3,
-        averageRating: 5.0,
-        totalReviews: 5,
-        isPremium: false,
-        imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=200'
       }
     ];
   }

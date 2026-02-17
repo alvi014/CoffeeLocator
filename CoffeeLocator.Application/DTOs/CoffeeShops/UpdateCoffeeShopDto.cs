@@ -1,11 +1,12 @@
 ﻿namespace CoffeeLocator.Application.DTOs.CoffeeShops;
 
-public record CreateCoffeeShopDto(
+public record UpdateCoffeeShopDto(
+    Guid Id, 
     string Name,
-    string? GooglePlaceId,  
+    string? Description,
     string Address,
     double Latitude,
     double Longitude,
-    string? Description,
-    string? ImageUrl
+    string? ImageUrl,
+    bool IsPremium 
 );

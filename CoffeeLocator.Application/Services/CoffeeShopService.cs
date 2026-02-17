@@ -1,5 +1,5 @@
-﻿using CoffeeLocator.Application.DTOs.CoffeeShops;
-using CoffeeLocator.Application.DTOs.Reviews;
+﻿using AutoMapper;
+using CoffeeLocator.Application.DTOs.CoffeeShops;
 using CoffeeLocator.Application.Interfaces;
 using CoffeeLocator.Domain.Entities;
 using CoffeeLocator.Domain.Interfaces;
@@ -8,129 +8,106 @@ namespace CoffeeLocator.Application.Services;
 
 public class CoffeeShopService : ICoffeeShopService
 {
-    private readonly ICoffeeShopRepository _repository;
-    private readonly IGooglePlacesService _googlePlacesService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public CoffeeShopService(ICoffeeShopRepository repository, IGooglePlacesService googlePlacesService)
+    public CoffeeShopService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _repository = repository;
-        _googlePlacesService = googlePlacesService;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
-
     /// <summary>
-    /// Metod <see langword="for"/> getting all CoffeeShops including their reviews and calculating the distance from the user's location.
+    /// Metod to retrieve nearby coffee shops based on user's location and specified radius. It calculates the distance using the Haversine formula and returns a list of shops within the radius, sorted by proximity.
     /// </summary>
-    /// <param name="userLat">User's latitude</param>
-    /// <param name="userLng">User's longitude</param>
-    /// <param name="radiusInKm">Search radius</param>
-    /// <returns>A list of nearby coffee shops with distance and rating</returns>
+    /// <param name="userLat"></param>
+    /// <param name="userLng"></param>
+    /// <param name="radiusInKm"></param>
+    /// <returns></returns>
     public async Task<IEnumerable<CoffeeShopNearbyDto>> GetNearbyShopsAsync(double userLat, double userLng, double radiusInKm = 5)
     {
-        var shops = await _repository.GetAllWithReviewsAsync();
+        var shops = await _unitOfWork.CoffeeShops.GetAllWithReviewsAsync();
 
-        return shops.Select(s =>
+        var shopDtos = shops.Select(s =>
         {
             var distance = CalculateHaversine(userLat, userLng, s.Latitude, s.Longitude);
+            var dto = _mapper.Map<CoffeeShopNearbyDto>(s);
 
-            return new CoffeeShopNearbyDto(
-                s.Id,
-                s.Name,
-                s.Address,
-                s.Latitude,
-                s.Longitude,
-                Math.Round(distance, 2),
-                s.AverageRating,
-                s.TotalReviews,
-                s.IsPremium,
-                s.ImageUrl 
-            );
+            dto.DistanceInKm = Math.Round(distance, 2);
+
+            return dto;
         })
         .Where(s => s.DistanceInKm <= radiusInKm)
         .OrderBy(s => s.DistanceInKm)
         .ToList();
+
+        return shopDtos;
     }
 
     /// <summary>
-    /// Metod <see langword="for"/> getting a CoffeeShop by its unique identifier.
+    /// Metod to retrieve detailed information about a specific coffee shop by its ID. It includes all relevant details such as name, description, address, average rating, and recent reviews. If the shop is not found, it returns null.
     /// </summary>
-    /// <param name="id">Id <see langword="for"/> the coffee shop</param>
-    /// <returns>The detailed coffee shop data including reviews</returns>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task<CoffeeShopDetailDto?> GetShopByIdAsync(Guid id)
     {
-        var shop = await _repository.GetByIdWithReviewsAsync(id);
-
-        if (shop == null) return null;
-
-        return new CoffeeShopDetailDto(
-            shop.Id,
-            shop.Name,
-            shop.Description ?? "",
-            shop.Address,
-            shop.GooglePlaceId,
-            shop.Latitude,
-            shop.Longitude,
-            shop.IsPremium,
-            shop.AverageRating,
-            shop.TotalReviews,
-            shop.Reviews.Select(r => new ReviewResponseDto(
-                r.Id,
-                r.CreatedBy ?? "Usuario",
-                r.Comment,
-                r.Rating,
-                r.CreatedAt
-            )).ToList(),
-            shop.ImageUrl 
-        );
+        var shop = await _unitOfWork.CoffeeShops.GetByIdWithReviewsAsync(id);
+        return _mapper.Map<CoffeeShopDetailDto>(shop);
     }
 
     /// <summary>
-    /// Metod <see langword="for"/> creating a new CoffeeShop entity and saving it to the repository.
+    /// Metod to create a new coffee shop in the system. It takes a DTO containing the necessary information, maps it to the CoffeeShop entity, and saves it to the database. After successful creation, it returns the details of the newly created shop.
     /// </summary>
-    /// <param name="dto">DTO containing creation data</param>
-    /// <returns>The created coffee shop details</returns>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     public async Task<CoffeeShopDetailDto> CreateCoffeeShopAsync(CreateCoffeeShopDto dto)
     {
-        var shop = new CoffeeShop(dto.Name, dto.GooglePlaceId, dto.Address, dto.Latitude, dto.Longitude);
+        var shop = _mapper.Map<CoffeeShop>(dto);
 
+        await _unitOfWork.CoffeeShops.AddAsync(shop);
+        await _unitOfWork.SaveChangesAsync(); 
 
-        shop.Description = dto.Description;
-        shop.ImageUrl = dto.ImageUrl; 
-
-        await _repository.AddAsync(shop);
-
-        return new CoffeeShopDetailDto(
-            shop.Id,
-            shop.Name,
-            shop.Description ?? "",
-            shop.Address,
-            shop.GooglePlaceId,
-            shop.Latitude,
-            shop.Longitude,
-            shop.IsPremium,
-            0, 
-            0, 
-            new List<ReviewResponseDto>(),
-            shop.ImageUrl 
-        );
+        return _mapper.Map<CoffeeShopDetailDto>(shop);
     }
 
     /// <summary>
-    /// Metod <see langword="for"/> deleting a CoffeeShop by its unique identifier.
+    /// Metod to update an existing coffee shop's information. It retrieves the shop by ID, updates its properties based on the provided DTO, and saves the changes to the database. If the shop is not found, it returns false; otherwise, it returns true after a successful update.
     /// </summary>
-    /// <param name="id">Guid of the shop to delete</param>
-    /// <returns>True if deleted, false otherwise</returns>
-    public async Task<bool> DeleteAsync(Guid id)
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    public async Task<bool> UpdateShopAsync(UpdateCoffeeShopDto dto)
     {
-        var shop = await _repository.GetByIdAsync(id);
+        var shop = await _unitOfWork.CoffeeShops.GetByIdAsync(dto.Id);
         if (shop == null) return false;
+        _mapper.Map(dto, shop);
+        await _unitOfWork.CoffeeShops.UpdateAsync(shop);
 
-        await _repository.DeleteAsync(shop);
+        await _unitOfWork.SaveChangesAsync();
         return true;
     }
 
     /// <summary>
-    /// Metod <see langword="for"/> calculating the distance between two geographic coordinates using the Haversine formula.
+    /// Deletes a coffee shop from the system based on its ID. It first checks if the shop exists, and if it does, it removes it from the database and commits the changes. If the shop is not found, it returns false; otherwise, it returns true after successful deletion.
     /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var shop = await _unitOfWork.CoffeeShops.GetByIdAsync(id);
+        if (shop == null) return false;
+
+        await _unitOfWork.CoffeeShops.DeleteAsync(shop);
+        await _unitOfWork.SaveChangesAsync();
+        return true;
+    }
+
+    /// <summary>
+    /// Metod to calculate the distance between two geographic coordinates (latitude and longitude) using the Haversine formula. This formula accounts for the curvature of the Earth, providing an accurate distance measurement in kilometers. The method takes the latitude and longitude of two points and returns the distance between them.
+    /// </summary>
+    /// <param name="lat1"></param>
+    /// <param name="lon1"></param>
+    /// <param name="lat2"></param>
+    /// <param name="lon2"></param>
+    /// <returns></returns>
     private double CalculateHaversine(double lat1, double lon1, double lat2, double lon2)
     {
         var d1 = lat1 * (Math.PI / 180.0);

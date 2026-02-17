@@ -1,0 +1,241 @@
+<div class="admin-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">☕</div>
+        <div>
+          <div class="logo-text">CoffeeLocator</div>
+          <div class="logo-sub">Admin Console</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item"><span class="nav-icon">▦</span> Dashboard</div>
+      <div class="nav-item active">
+        <span class="nav-icon">☕</span> Coffee Shops
+        <span class="nav-badge">{{ shops.length }}</span>
+      </div>
+      <div class="nav-item"><span class="nav-icon">★</span> Reviews</div>
+
+      <div class="nav-section-label">Management</div>
+      <div class="nav-item"><span class="nav-icon">◉</span> Analytics</div>
+      <div class="nav-item"><span class="nav-icon">◈</span> Users</div>
+      <div class="nav-item"><span class="nav-icon">◎</span> Reports</div>
+
+      <div class="nav-section-label">System</div>
+      <div class="nav-item"><span class="nav-icon">⊙</span> Settings</div>
+      <div class="nav-item"><span class="nav-icon">◷</span> Audit Log</div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin</div>
+          <div class="role">SUPER ADMIN</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span class="sep">/</span>
+        <span class="current">Coffee Shops</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="status-dot" title="API Connected"></div>
+        <button class="btn btn-ghost">↓ Export CSV</button>
+        <button class="btn btn-primary" (click)="openCreateModal()">+ Add Shop</button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Coffee Shop <em>Registry</em></h1>
+          <p class="page-subtitle">{{ shops.length }} ACTIVE ESTABLISHMENTS · LAST SYNC JUST NOW</p>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Shops</div>
+          <div class="kpi-value">{{ shops.length }}</div>
+          <div class="kpi-meta">
+            <span class="kpi-change neutral">= 0</span>
+            <span>vs last month</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Avg. Rating</div>
+          <div class="kpi-value">{{ avgRating | number:'1.1-1' }}</div>
+          <div class="kpi-meta">
+            <span class="kpi-change up">↑ network avg</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Total Reviews</div>
+          <div class="kpi-value">{{ totalReviews }}</div>
+          <div class="kpi-meta">
+            <span class="kpi-change up">↑ active</span>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Premium Shops</div>
+          <div class="kpi-value">{{ premiumCount }}</div>
+          <div class="kpi-meta">
+            <span class="kpi-change neutral">{{ premiumPct | number:'1.0-0' }}%</span>
+            <span>of total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="table-toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" placeholder="Search by name, location..." [(ngModel)]="searchTerm">
+          </div>
+          <div class="filter-chip" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">All</div>
+          <div class="filter-chip" [class.active]="activeFilter === 'premium'" (click)="setFilter('premium')">Premium</div>
+          <div class="filter-chip" [class.active]="activeFilter === 'standard'" (click)="setFilter('standard')">Standard</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span class="sort-label">SORT BY</span>
+          <div class="filter-chip" (click)="toggleSort()">Rating {{ sortAsc ? '↑' : '↓' }}</div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Establishment</th>
+              <th>Location</th>
+              <th class="center">Rating</th>
+              <th class="center">Reviews</th>
+              <th class="center">Distance</th>
+              <th class="center">Status</th>
+              <th class="right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- LOADING -->
+            <tr *ngIf="isLoading">
+              <td colspan="7" class="empty-state">
+                <span class="loading-text">Loading establishments...</span>
+              </td>
+            </tr>
+
+            <!-- ROWS -->
+            <tr *ngFor="let shop of filteredShops">
+              <td>
+                <div class="shop-cell">
+                  <div class="shop-avatar">
+                    <img [src]="shop.imageUrl || ''"
+                         (error)="$any($event.target).src = 'https://ui-avatars.com/api/?name=' + shop.name + '&background=2a2622&color=c8813a&size=36'"
+                         [alt]="shop.name">
+                  </div>
+                  <div>
+                    <div class="shop-name">{{ shop.name }}</div>
+                    <div class="shop-id">{{ shop.id.toString().substring(0,8).toUpperCase() }}...</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="location-main" [title]="shop.address">{{ shop.address }}</div>
+                <div class="location-coords">
+                  {{ shop.latitude | number:'1.4-4' }}° N · {{ shop.longitude | number:'1.4-4' }}° W
+                </div>
+              </td>
+
+              <td class="center">
+                <div class="rating-score">
+                  <span class="star">★</span>
+                  <span class="rating-num">{{ shop.averageRating | number:'1.1-1' }}</span>
+                </div>
+              </td>
+
+              <td class="center">
+                <span class="reviews-count">{{ shop.totalReviews }}</span>
+                <div class="mini-bars">
+                  <div class="mini-bar" *ngFor="let h of [3,6,8,5,9]" [style.height.px]="h * 2"></div>
+                </div>
+              </td>
+
+              <td class="center">
+                <span class="distance-val">{{ shop.distanceInKm | number:'1.2-2' }}</span>
+                <span class="distance-unit"> km</span>
+              </td>
+
+              <td class="center">
+                <span class="badge badge-premium" *ngIf="shop.isPremium">
+                  <span class="badge-dot"></span>Premium
+                </span>
+                <span class="badge badge-standard" *ngIf="!shop.isPremium">
+                  <span class="badge-dot"></span>Standard
+                </span>
+              </td>
+
+              <td>
+                <div class="actions">
+                  <button class="action-btn view" (click)="viewAnalytics(shop.id)" title="Analytics">◈</button>
+                  <button class="action-btn edit" (click)="editShop(shop)" title="Edit">✏</button>
+                  <button class="action-btn delete" (click)="deleteShop(shop.id)" title="Delete">⊘</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- EMPTY -->
+            <tr *ngIf="!isLoading && filteredShops.length === 0">
+              <td colspan="7" class="empty-state">
+                <span style="font-size:28px;display:block;margin-bottom:8px;opacity:0.3">☕</span>
+                <span>No establishments found in the registry.</span>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <div class="table-footer">
+          <span class="table-info">SHOWING {{ filteredShops.length }} OF {{ shops.length }} RESULTS</span>
+          <div class="pagination">
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CREATE / EDIT -->
+<app-coffee-shop-modal
+  *ngIf="showModal"
+  [shop]="selectedShop"
+  (closed)="onModalClose()"
+  (saved)="onModalSaved()">
+</app-coffee-shop-modal>

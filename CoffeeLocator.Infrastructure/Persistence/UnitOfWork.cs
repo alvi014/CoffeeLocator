@@ -1,5 +1,6 @@
 ﻿using CoffeeLocator.Domain.Interfaces;
 using CoffeeLocator.Infrastructure.Persistence;
+using CoffeeLocator.Infrastructure.Repositories;
 
 namespace CoffeeLocator.Infrastructure.Persistence
 {
@@ -7,37 +8,29 @@ namespace CoffeeLocator.Infrastructure.Persistence
     {
         private readonly AppDbContext _context;
 
-        public ICoffeeShopRepository CoffeeShops { get; }
-        public IVisitRepository Visits { get; }
-        public IAchievementRepository Achievements { get; } 
-        public IUserRepository Users { get; }
-        public IReviewRepository Reviews { get; }
+        // Campos privados para caché
+        private ICoffeeShopRepository? _coffeeShops;
+        private IVisitRepository? _visits;
+        private IAchievementRepository? _achievements;
+        private IUserRepository? _users;
+        private IReviewRepository? _reviews;
 
-        /// <summary>
-        /// Builder of inyection dependencys
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="coffeeShops"></param>
-        /// <param name="visits"></param>
-        /// <param name="achievements"></param>
-        /// <param name="users"></param>
-        /// <param name="reviews"></param>
-        public UnitOfWork(
-            AppDbContext context,
-            ICoffeeShopRepository coffeeShops,
-            IVisitRepository visits,
-            IAchievementRepository achievements,
-            IUserRepository users, 
-            IReviewRepository reviews) 
+        public UnitOfWork(AppDbContext context)
         {
             _context = context;
-            CoffeeShops = coffeeShops;
-            Visits = visits;
-            Achievements = achievements;
-            Users = users;
-            Reviews = reviews;
         }
 
+        // Propiedades con inicialización perezosa (Lazy Loading)
+        // Si es nula, la crea; si ya existe, devuelve la misma instancia.
+        public ICoffeeShopRepository CoffeeShops => _coffeeShops ??= new CoffeeShopRepository(_context);
+        public IVisitRepository Visits => _visits ??= new VisitRepository(_context);
+        public IAchievementRepository Achievements => _achievements ??= new AchievementRepository(_context);
+        public IUserRepository Users => _users ??= new UserRepository(_context);
+        public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
+
+        /// <summary>
+        /// Persists all changes tracked by the context to the database.
+        /// </summary>
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
@@ -46,6 +39,7 @@ namespace CoffeeLocator.Infrastructure.Persistence
         public void Dispose()
         {
             _context.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
