@@ -1,0 +1,159 @@
+<!-- BACKDROP -->
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+
+  <div class="modal-panel" role="dialog" aria-modal="true">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-icon">{{ isEditMode ? '✏' : '☕' }}</div>
+        <div>
+          <h2 class="modal-title">{{ isEditMode ? 'Edit Establishment' : 'Register Establishment' }}</h2>
+          <p class="modal-subtitle">{{ isEditMode ? 'Update shop details in the registry' : 'Add a new coffee shop to the network' }}</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="close()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <div class="modal-body">
+
+        <!-- IMAGE SECTION -->
+        <div class="image-section">
+          <div class="image-preview" [class.has-image]="shopForm.get('imageUrl')?.value">
+            <img *ngIf="shopForm.get('imageUrl')?.value"
+                 [src]="shopForm.get('imageUrl')?.value"
+                 (error)="$any($event.target).style.display='none'"
+                 alt="Shop preview">
+            <div class="image-placeholder" *ngIf="!shopForm.get('imageUrl')?.value">
+              <span class="placeholder-icon">🖼</span>
+              <span class="placeholder-text">Preview</span>
+            </div>
+          </div>
+          <div class="image-input-group">
+            <label class="field-label">Image URL <span class="optional">optional</span></label>
+            <input type="url" class="field-input" formControlName="imageUrl"
+                   placeholder="https://images.unsplash.com/...">
+            <span class="field-hint">Paste a direct link to the shop photo</span>
+          </div>
+        </div>
+
+        <!-- BASIC INFO -->
+        <div class="section-divider"><span class="divider-label">Basic Info</span></div>
+
+        <div class="form-row">
+          <div class="field-group">
+            <label class="field-label">Shop Name <span class="required">*</span></label>
+            <input type="text" class="field-input" [class.error]="isInvalid('name')"
+                   formControlName="name" placeholder="e.g. Café Franco">
+            <span class="field-error" *ngIf="isInvalid('name')">Name is required</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              Google Place ID <span class="optional">optional</span>
+              <span class="field-tooltip" title="For future Google Maps integration">?</span>
+            </label>
+            <input type="text" class="field-input" formControlName="googlePlaceId"
+                   placeholder="ChIJN1t_tDeuEmsR... (optional)">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Address <span class="required">*</span></label>
+          <input type="text" class="field-input" [class.error]="isInvalid('address')"
+                 formControlName="address" placeholder="e.g. Barrio Escalante, San José">
+          <span class="field-error" *ngIf="isInvalid('address')">Address is required</span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Description <span class="optional">optional</span></label>
+          <textarea class="field-input field-textarea" formControlName="description"
+                    rows="2" placeholder="Atmosphere, specialty drinks, vibe..."></textarea>
+        </div>
+
+        <!-- COORDINATES + MAP -->
+        <div class="section-divider"><span class="divider-label">Location</span></div>
+
+        <!-- Coord display row -->
+        <div class="coord-row">
+          <div class="field-group">
+            <label class="field-label">Latitude <span class="required">*</span></label>
+            <input type="number" class="field-input mono" [class.error]="isInvalid('latitude')"
+                   formControlName="latitude" placeholder="9.9366" step="0.000001">
+            <span class="field-error" *ngIf="isInvalid('latitude')">{{ getCoordError('latitude') }}</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Longitude <span class="required">*</span></label>
+            <input type="number" class="field-input mono" [class.error]="isInvalid('longitude')"
+                   formControlName="longitude" placeholder="-84.0633" step="0.000001">
+            <span class="field-error" *ngIf="isInvalid('longitude')">{{ getCoordError('longitude') }}</span>
+          </div>
+          <div class="field-group field-group-btn">
+            <label class="field-label">&nbsp;</label>
+            <button type="button" class="btn-locate" (click)="useMyLocation()" [disabled]="locating">
+              <span *ngIf="!locating">◎ My Location</span>
+              <span *ngIf="locating" class="spinner-sm"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MINI MAP -->
+        <div class="map-container">
+          <div class="map-hint" *ngIf="!mapReady">
+            <span class="map-hint-icon">🗺</span>
+            <span>Click "Pin on map" to place the coffee shop</span>
+          </div>
+          <div id="modal-map" [class.visible]="mapReady"></div>
+          <div class="map-toolbar">
+            <button type="button" class="btn-map-toggle" (click)="toggleMap()">
+              {{ mapReady ? '▲ Hide map' : '▼ Pin on map' }}
+            </button>
+            <span class="map-coords-live" *ngIf="mapReady && shopForm.get('latitude')?.value">
+              {{ shopForm.get('latitude')?.value | number:'1.4-4' }},
+              {{ shopForm.get('longitude')?.value | number:'1.4-4' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- STATUS (edit only) -->
+        <div class="section-divider" *ngIf="isEditMode"><span class="divider-label">Status</span></div>
+
+        <div class="premium-toggle" *ngIf="isEditMode">
+          <div class="toggle-info">
+            <span class="toggle-label">Premium Establishment</span>
+            <span class="toggle-desc">Featured placement and priority in search results</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" formControlName="isPremium">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <!-- FOOTER -->
+      <div class="modal-footer">
+        <div class="footer-left">
+          <span class="form-status" *ngIf="submitError">
+            <span class="status-icon">⚠</span> {{ submitError }}
+          </span>
+          <span class="form-status success" *ngIf="submitSuccess">
+            <span class="status-icon">✓</span> {{ isEditMode ? 'Shop updated' : 'Shop created' }} successfully
+          </span>
+        </div>
+        <div class="footer-actions">
+          <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="isSubmitting">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || shopForm.invalid">
+            <span class="spinner" *ngIf="isSubmitting"></span>
+            <span *ngIf="!isSubmitting">{{ isEditMode ? 'Save Changes' : 'Register Shop' }}</span>
+            <span *ngIf="isSubmitting">{{ isEditMode ? 'Saving...' : 'Registering...' }}</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

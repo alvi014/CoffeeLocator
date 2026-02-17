@@ -6,6 +6,8 @@ import { RegisterComponent } from './features/register/register.component';
 import { adminGuard } from './core/guards/admin/admin-guard';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard.component';
 
+
+
 export const routes: Routes = [
   { path: '', component: HomeComponent }, 
   {

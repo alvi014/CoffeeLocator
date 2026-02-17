@@ -16,8 +16,8 @@ public class CreateCoffeeShopValidator : AbstractValidator<CreateCoffeeShopDto>
             .Must(name => !string.IsNullOrWhiteSpace(name)).WithMessage("El nombre no puede ser solo espacios.");
 
         RuleFor(x => x.GooglePlaceId)
-            .NotEmpty().WithMessage("El Google Place ID es obligatorio para la sincronización con mapas.")
-            .Matches(@"^[a-zA-Z0-9_-]+$").WithMessage("El Google Place ID tiene un formato inválido.");
+            .Matches(@"^[a-zA-Z0-9_-]+$").WithMessage("El Google Place ID tiene un formato inválido.")
+            .When(x => !string.IsNullOrWhiteSpace(x.GooglePlaceId));
 
         RuleFor(x => x.Latitude)
             .NotEmpty().WithMessage("La latitud es obligatoria.")
@@ -27,7 +27,6 @@ public class CreateCoffeeShopValidator : AbstractValidator<CreateCoffeeShopDto>
             .NotEmpty().WithMessage("La longitud es obligatoria.")
             .InclusiveBetween(-180, 180).WithMessage("La longitud debe ser una coordenada válida entre -180 y 180.");
 
-  
         RuleFor(x => x.Address)
             .NotEmpty().WithMessage("La dirección física es necesaria.");
     }

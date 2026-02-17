@@ -2,7 +2,7 @@
 
 public record CreateCoffeeShopDto(
     string Name,
-    string GooglePlaceId,
+    string? GooglePlaceId,  
     string Address,
     double Latitude,
     double Longitude,
