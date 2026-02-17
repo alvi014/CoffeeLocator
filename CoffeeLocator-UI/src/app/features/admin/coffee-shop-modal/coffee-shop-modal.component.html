@@ -9,7 +9,7 @@
         <div class="modal-icon">{{ isEditMode ? '✏' : '☕' }}</div>
         <div>
           <h2 class="modal-title">{{ isEditMode ? 'Edit Establishment' : 'Register Establishment' }}</h2>
-          <p class="modal-subtitle">{{ isEditMode ? 'Update shop details in the registry' : 'Add a new coffee shop to the network' }}</p>
+          <p class="modal-subtitle">{{ isEditMode ? 'Update shop details' : 'Add new coffee shop to network' }}</p>
         </div>
       </div>
       <button class="close-btn" (click)="close()" aria-label="Close">✕</button>
@@ -20,13 +20,12 @@
 
       <div class="modal-body">
 
-        <!-- IMAGE SECTION -->
+        <!-- IMAGE -->
         <div class="image-section">
           <div class="image-preview" [class.has-image]="shopForm.get('imageUrl')?.value">
             <img *ngIf="shopForm.get('imageUrl')?.value"
                  [src]="shopForm.get('imageUrl')?.value"
-                 (error)="$any($event.target).style.display='none'"
-                 alt="Shop preview">
+                 (error)="$any($event.target).style.display='none'" alt="Shop preview">
             <div class="image-placeholder" *ngIf="!shopForm.get('imageUrl')?.value">
               <span class="placeholder-icon">🖼</span>
               <span class="placeholder-text">Preview</span>
@@ -57,7 +56,7 @@
               <span class="field-tooltip" title="For future Google Maps integration">?</span>
             </label>
             <input type="text" class="field-input" formControlName="googlePlaceId"
-                   placeholder="ChIJN1t_tDeuEmsR... (optional)">
+                   placeholder="ChIJ... (optional)">
           </div>
         </div>
 
@@ -74,10 +73,20 @@
                     rows="2" placeholder="Atmosphere, specialty drinks, vibe..."></textarea>
         </div>
 
-        <!-- COORDINATES + MAP -->
+        <!-- LOCATION -->
         <div class="section-divider"><span class="divider-label">Location</span></div>
 
-        <!-- Coord display row -->
+        <!-- SEARCH BAR -->
+        <div class="search-location">
+          <input type="text" class="search-input" [(ngModel)]="searchQuery" [ngModelOptions]="{standalone: true}"
+                 placeholder="Search city or address (e.g. Ciudad Quesada)" (keyup.enter)="searchLocation()">
+          <button type="button" class="btn-search" (click)="searchLocation()" [disabled]="searching || !searchQuery.trim()">
+            <span *ngIf="!searching">🔍 Search</span>
+            <span *ngIf="searching" class="spinner-sm"></span>
+          </button>
+        </div>
+
+        <!-- COORDS -->
         <div class="coord-row">
           <div class="field-group">
             <label class="field-label">Latitude <span class="required">*</span></label>
@@ -124,7 +133,7 @@
         <div class="premium-toggle" *ngIf="isEditMode">
           <div class="toggle-info">
             <span class="toggle-label">Premium Establishment</span>
-            <span class="toggle-desc">Featured placement and priority in search results</span>
+            <span class="toggle-desc">Featured placement and priority in search</span>
           </div>
           <label class="switch">
             <input type="checkbox" formControlName="isPremium">
@@ -141,7 +150,7 @@
             <span class="status-icon">⚠</span> {{ submitError }}
           </span>
           <span class="form-status success" *ngIf="submitSuccess">
-            <span class="status-icon">✓</span> {{ isEditMode ? 'Shop updated' : 'Shop created' }} successfully
+            <span class="status-icon">✓</span> {{ isEditMode ? 'Shop updated' : 'Shop created' }}
           </span>
         </div>
         <div class="footer-actions">

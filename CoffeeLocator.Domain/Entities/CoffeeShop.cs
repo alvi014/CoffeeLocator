@@ -7,8 +7,8 @@ namespace CoffeeLocator.Domain.Entities;
 /// </summary>
 public class CoffeeShop : BaseEntity
 {
-    public string Name { get; set; } 
-    public string GooglePlaceId { get; set; }
+    public string Name { get; set; }
+    public string? GooglePlaceId { get; set; }
     public string? Description { get; set; }
     public string Address { get; set; }
     public double Latitude { get; set; }
@@ -32,7 +32,7 @@ public class CoffeeShop : BaseEntity
     /// <param name="longitude">Longitude coordinate.</param>
     /// <param name="description">Optional description.</param>
     /// <param name="isPremium">Indicates whether the shop is premium.</param>
-    public CoffeeShop(string name, string googlePlaceId, string address, double latitude, double longitude, string? description = null, bool isPremium = false)
+    public CoffeeShop(string name, string? googlePlaceId, string address, double latitude, double longitude, string? description = null, bool isPremium = false)
     {
         Name = name;
         GooglePlaceId = googlePlaceId;

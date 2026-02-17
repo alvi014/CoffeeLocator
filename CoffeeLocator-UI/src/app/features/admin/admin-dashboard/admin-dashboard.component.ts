@@ -19,7 +19,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Modal state
   showModal = false;
-  selectedShop?: CoffeeShopNearby;  // undefined = create, shop = edit
+  selectedShop?: CoffeeShopNearby;  
 
   // Filters & sorting
   searchTerm = '';
@@ -115,7 +115,7 @@ export class AdminDashboardComponent implements OnInit {
   onModalSaved(): void {
     this.showModal = false;
     this.selectedShop = undefined;
-    this.loadShops();  // refresca la lista desde la API
+    this.loadShops(); 
   }
 
   // ── DELETE ────────────────────────────────────────────────────────────────

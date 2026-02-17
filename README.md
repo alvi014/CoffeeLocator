@@ -184,48 +184,67 @@ CoffeeLocator/
 ### Frontend Structure
 ```
 CoffeeLocator-Frontend/
-├── public/
+├── public
 │   └── favicon.ico
-├── src/
-│   ├── app/
-│   │   ├── core/
-│   │   │   ├── guards/
-│   │   │   │   ├── auth-guard.spec.ts
-│   │   │   │   └── auth-guard.ts
-│   │   │   ├── interceptors/
+├── src
+│   ├── app
+│   │   ├── core
+│   │   │   ├── guards
+│   │   │   │   ├── admin
+│   │   │   │   │   ├── admin-guard.spec.ts
+│   │   │   │   │   └── admin-guard.ts
+│   │   │   │   └── auth
+│   │   │   │       ├── auth-guard.spec.ts
+│   │   │   │       └── auth-guard.ts
+│   │   │   ├── interceptors
 │   │   │   │   └── jwt.interceptor.ts
-│   │   │   └── services/
-│   │   │       └── auth/
+│   │   │   └── services
+│   │   │       └── auth
 │   │   │           ├── auth.service.ts
 │   │   │           └── auth.services.spec.ts
-│   │   ├── data/
-│   │   │   └── services/
+│   │   ├── data
+│   │   │   └── services
 │   │   │       └── coffee-shop.service.ts
-│   │   ├── features/
-│   │   │   ├── auth/
-│   │   │   │   └── login/
+│   │   ├── features
+│   │   │   ├── admin
+│   │   │   │   ├── admin-dashboard
+│   │   │   │   │   ├── admin-dashboard.component.css
+│   │   │   │   │   ├── admin-dashboard.component.html
+│   │   │   │   │   ├── admin-dashboard.component.ts
+│   │   │   │   │   └── admin-dashboard.spec.ts
+│   │   │   │   ├── coffee-shop-form
+│   │   │   │   │   ├── coffee-shop-form.component.css
+│   │   │   │   │   ├── coffee-shop-form.component.html
+│   │   │   │   │   ├── coffee-shop-form.component.ts
+│   │   │   │   │   └── coffee-shop-form.spec.ts
+│   │   │   │   └── coffee-shop-modal
+│   │   │   │       ├── coffee-shop-modal.component.css
+│   │   │   │       ├── coffee-shop-modal.component.html
+│   │   │   │       └── coffee-shop-modal.component.ts
+│   │   │   ├── auth
+│   │   │   │   └── login
 │   │   │   │       ├── login.component.css
 │   │   │   │       ├── login.component.html
 │   │   │   │       └── login.component.ts
-│   │   │   ├── coffee-map/
+│   │   │   ├── coffee-map
 │   │   │   │   ├── coffee-map.component.css
 │   │   │   │   ├── coffee-map.component.html
 │   │   │   │   └── coffee-map.component.ts
-│   │   │   ├── home/
+│   │   │   ├── home
 │   │   │   │   ├── home.component.css
 │   │   │   │   ├── home.component.html
 │   │   │   │   └── home.component.ts
-│   │   │   └── register/
+│   │   │   └── register
 │   │   │       ├── register.component.css
 │   │   │       ├── register.component.html
 │   │   │       └── register.component.ts
-│   │   ├── shared/
-│   │   │   ├── components/
-│   │   │   │   └── header/
+│   │   ├── shared
+│   │   │   ├── components
+│   │   │   │   └── header
 │   │   │   │       ├── header.component.css
 │   │   │   │       ├── header.component.html
 │   │   │   │       └── header.component.ts
-│   │   │   └── models/
+│   │   │   └── models
 │   │   │       ├── achievement.model.ts
 │   │   │       ├── coffee-shop.model.ts
 │   │   │       ├── review.model.ts
@@ -238,10 +257,15 @@ CoffeeLocator-Frontend/
 │   ├── index.html
 │   ├── main.ts
 │   └── styles.css
+├── .editorconfig
+├── .gitignore
 ├── angular.json
+├── package-lock.json
 ├── package.json
 ├── tailwind.config.js
-└── tsconfig.json
+├── tsconfig.app.json
+├── tsconfig.json
+└── tsconfig.spec.json
 ```
 
 ---
